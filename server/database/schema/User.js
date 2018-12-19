@@ -11,7 +11,7 @@ const userSchema = new Schema({
         type: ObjectId // 主键
     },
     userName: {
-        unique: true, 
+        unique: true, // 表示唯一
         type: String
     },
     passWord: String,
