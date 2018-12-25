@@ -23,6 +23,8 @@ const userSchema = new Schema({
         type: Date,
         default: Date.now()
     }
+}, {
+    collection: 'User'
 })
 userSchema.pre('save', function (next) {
     // 加盐
@@ -36,5 +38,19 @@ userSchema.pre('save', function (next) {
         })
     })
 })
+
+// 密码比对 实例方法
+userSchema.methods = {
+    //密码比对的方法  第一个： 客户端传递的； 数据库的
+    comparePassword: (_password, passWord) => {
+        return new Promise((resolve, reject) => {
+            bcrypt.compare(_password, passWord, (err, isMatch) => {
+                if (!err) resolve(isMatch)
+                else reject(err)
+            })
+        })
+    }
+}
+
 // 发布模型
 mongoose.model('User', userSchema) // 这里User要与数据库定义的名称一样
