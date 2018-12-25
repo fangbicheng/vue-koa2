@@ -7,17 +7,21 @@ const {
     connect,
     initSchemas
 } = require('./database/init.js')
+
+// 引入appApi
 let user = require('./appApi/user.js')
+let goods = require('./appApi/goods.js')
+
+// 装载所有子路由
+let router = new Router()
+router.use('/user', user.routes())
+router.use('/goods',goods.routes())
+
 // 解决跨域的中间件 koa2-cors
 const cors = require('koa2-cors')
 const app = new Koa()
-
 app.use(cors())
 app.use(bodyParser())
-
-// 转载所有子路由
-let router = new Router()
-router.use('/user', user.routes())
 
 // 加载路由中间件
 app.use(router.routes())
