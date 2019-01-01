@@ -5,6 +5,7 @@ let router = new Router()
 router.get('/', async (ctx) => {
     ctx.body = "这是用户操作首页"
 })
+// 用户注册
 router.post('/register', async (ctx) => {
     // console.log(ctx.request.body) 获取前端返回的数据
     // 取得User model
@@ -25,4 +26,52 @@ router.post('/register', async (ctx) => {
             }
         })
 })
+// 用户登录
+router.post('/login', async (ctx) => {
+    //得到前端传递过来的数据
+    let loginUser = ctx.request.body
+    console.log(loginUser)
+    let userName = loginUser.userName
+    let passWord = loginUser.passWord
+    //引入User的model
+    const User = mongoose.model('User')
+    //查找用户名是否存在，如果存在开始比对密码
+    await User.findOne({
+            userName: userName
+        }).exec()
+        .then(async (result) => {
+            if (result) {
+                //当用户名存在时，开始比对密码
+                console.log(result)
+                let newUser = new User() //因为是实例方法，所以要new出对象，才能调用
+                await newUser.comparePassword(passWord, result.passWord)
+                    .then(isMatch => {
+                        //返回比对结果
+                        ctx.body = {
+                            code: 200,
+                            message: isMatch
+                        }
+                    })
+                    .catch(error => {
+                        //出现异常，返回异常
+                        // console.log(error)
+                        ctx.body = {
+                            code: 500,
+                            message: error
+                        }
+                    })
+            } else {
+                ctx.body = {
+                    code: 200,
+                    message: '用户名不存在'
+                }
+            }
+        }).catch(error => {
+            ctx.body = {
+                code: 500,
+                message: error
+            }
+        })
+})
+
 module.exports = router;
