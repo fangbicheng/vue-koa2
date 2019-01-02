@@ -25,13 +25,13 @@
         <div id="listContent">
           <van-pull-refresh v-model="isRefresh" @refresh="onRefresh">
             <van-list v-model="loading" :finished="finished" @load="onLoad" >
-              <div class="list-item" v-for="(item,index) of goodList" :key="index" >
+              <div class="list-item" @click="goGoodsInfo(item.ID)" v-for="(item,index) of goodList" :key="index" >
                 <div class="list-item-img">
                   <img :src="item.IMAGE1" width="100%" :onerror="errorImg" />
                 </div>
                 <div class="list-item-text">
                   <div>{{item.NAME}}</div>
-                  <div>￥{{item.ORI_PRICE}}</div>
+                  <div>￥{{item.ORI_PRICE | moneyFilter}}</div>
                 </div>
               </div>
             </van-list>
@@ -167,6 +167,27 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    // 去商品详情页
+    goGoodsInfo(id) {
+      // 编程式导航
+      // this.$router.push({name: 'Goods',params: {goodsId: id}})
+      this.$router.push({path: '/goods', query: {goodsId: id}})
+
+      /**
+       * params和query传参的用法
+       * 
+       * 1、params传参，路径不能使用path，只能使用name，不然取不到传的数据
+       *    this.$router.push({name:'Goods',params:{goodsId:id}})
+       *    取数据时：
+       *    this.$route.params.goodsId
+       * 
+       * 2、query传参，用的是path，而不是name,否则也会出错。
+       *    this.$router.push({path: '/goods', query: {goodsId: id}})
+       *    取数据时: 
+       *    this.$route.query.goodsId
+       */
+
     }
   },
   //   通过js，让左侧当行适应页面高度
@@ -174,6 +195,11 @@ export default {
     let winHeight = document.documentElement.clientHeight;
     document.getElementById("leftNav").style.height = winHeight - 46 + "px";
     document.getElementById("listContent").style.height = winHeight - 90 + "px";
+  },
+  filters: {
+    moneyFilter(money) {
+      return toMoney(money)
+    }
   }
 };
 </script>
