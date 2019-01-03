@@ -193,8 +193,8 @@ export default {
   //   通过js，让左侧当行适应页面高度
   mounted() {
     let winHeight = document.documentElement.clientHeight;
-    document.getElementById("leftNav").style.height = winHeight - 46 + "px";
-    document.getElementById("listContent").style.height = winHeight - 90 + "px";
+    document.getElementById("leftNav").style.height = winHeight - 46 - 50 + "px";
+    document.getElementById("listContent").style.height = winHeight - 90 -50 + "px";
   },
   filters: {
     moneyFilter(money) {
