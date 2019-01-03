@@ -16,9 +16,12 @@ import {
   Toast,
   Tab,
   Tabs,
-  PullRefresh
+  PullRefresh,
+  Stepper,
+  Tabbar,
+  TabbarItem
 } from 'vant'
-Vue.use(PullRefresh).use(Tab).use(Tabs).use(Button).use(Row).use(Col).use(Swipe).use(SwipeItem).use(Lazyload).use(List).use(Field).use(NavBar).use(Toast)
+Vue.use(Tabbar).use(TabbarItem).use(Stepper).use(PullRefresh).use(Tab).use(Tabs).use(Button).use(Row).use(Col).use(Swipe).use(SwipeItem).use(Lazyload).use(List).use(Field).use(NavBar).use(Toast)
 
 Vue.config.productionTip = false
 
