@@ -9,25 +9,40 @@ export default new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [{
-      path: '/',
-      name: 'home',
-      component: Home
-    }, {
+      path: '/main',
+      name: 'Main',
+      component: () => import('./components/pages/Main.vue'),
+      children: [{
+          path: '/',
+          name: 'Home',
+          component: Home
+        },
+        {
+          path: '/categoryList',
+          name: 'CategoryList',
+          component: () => import('./components/pages/CategoryList.vue')
+        },
+        {
+          path: '/cart',
+          name: 'Cart',
+          component: () => import('./components/pages/Cart.vue')
+        }
+      ]
+    },
+    {
       path: '/register',
       name: 'Register',
       component: () => import('./components/pages/Register.vue')
-    }, {
+    },
+    {
       path: '/login',
       name: 'Login',
       component: () => import('./components/pages/Login.vue')
-    }, {
+    },
+    {
       path: '/goods',
       name: 'Goods',
       component: () => import('./components/pages/Goods.vue')
-    }, {
-      path: '/categoryList',
-      name: 'CategoryList',
-      component: () => import('./components/pages/CategoryList.vue')
     }
     // {
     //   path: '/about',
