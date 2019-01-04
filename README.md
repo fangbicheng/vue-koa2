@@ -999,4 +999,166 @@ try {
 	  </van-tab>
     </van-tabs>
 	```
-未完待续...
+
+#### 4.6、Koa2分页服务制作
+
+制作`Koa2`中的数据读取服务了
+
+```python
+// 根据类别获取商品列表
+router.post('/getGoodsListByCategorySubID', async ctx => {
+    try {
+        let categorySubId = ctx.request.body.categorySubId // 子类ID号
+        let page = ctx.request.body.page // 当前页数
+        let num = 10 // 每页显示数量
+        let start = (page - 1) * num // 开始位置
+        const Goods = mongoose.model('Goods')
+        let result = await Goods.find({
+            SUB_ID: categorySubId
+        }).skip(start).limit(num).exec()
+        /**
+         * mongodb数据库查询分页信息
+         * 
+         * db.表名.find().skip((page-1)*pageSize).limit(pageSize)
+         * skip: 跳过当前已开始的
+         * limlt: 每页限制显示的数目
+         */
+        ctx.body = {
+            code: 200,
+            message: result
+        }
+    } catch (error) {
+        ctx.body = {
+            code: 500,
+            message: error
+        }
+    }
+})
+```
+
+在前端对应页面，增加`getGoodList`方法，这个方法里传递两个参数，第一个是**商品的子分类**，第二个是**请求分类的页数**
+
+```python
+data: {
+  categorySubId: this.categorySubId,  // 商品子类别id
+  page: this.page
+}
+```
+在下拉实现刷新获取数据时，需要使用**`concat`**合并数据,并且在没有数据时，上拉加载应禁止
+
+```python
+if (res.data.code === 200 && res.data.message.length) {
+ this.page++;
+  this.goodList = this.goodList.concat(res.data.message);
+} else {
+  // 没有数据 上拉加载禁止
+  this.finished = true;
+}
+```
+##### Vue中图片失效替补图片的制作方法
+
+在实际项目中，一些图片已经失效，但又不允许这样直接显示图片失效的，需要显示一个替补图片
+
+首先是在`data`中定义一个替补图片
+
+```python
+errorImg: 'this.src="'+ require('@/assets/images/error.png')+'"'
+```
+然后在图片位置加入**`onerror事件`**就ok了
+
+```python
+<div class="list-item-img">
+    <img :src="item.IMAGE1" width="100%" :onerror="errorImg"/>
+</div>
+```
+
+#### 4.7、购物车制作
+
+购物车页面不合后台交互，并且还要保持用户数据的**持久化**，主要用于在`H5`新增**`localStorage本地存储`**里
+
+##### 获取购物车数据
+
+进入页面要作的第一件事就是取得`localStorage`里的数据，先在`data`里注册两个属性`cartInfo`(购物车中商品的信息)和`isEmpty`（购物是否为空的标识，方便页面呈现）
+
+```python
+// 判断localStorage里是否有购物车数据
+getCartInfo() {
+  if (localStorage.cartInfo) {
+    this.cartInfo = JSON.parse(localStorage.cartInfo);
+  }
+  console.log("cartInfo:", JSON.stringify(this.cartInfo));
+  this.isEmpty = this.cartInfo.length > 0 ? true : false;
+}
+```
+`localStorage`里的数据本为字符串，需要使用`JSON.parse`转化为对象对其操作
+
+##### 向购物车中添加商品
+
+购物车商品的添加，其实就是对`localStorage`的操作和**数组查找**的使用，也就是`array.find()`操作.。该方法写在`Goods.vue`页面里，也就是商品详情页面，这样作的好处是以后好扩展，并且不用传递参数，直接操作`localStoarge`
+
+```python
+// 添加商品到购物车
+addGoodsToCart() {
+  // localStorage.removeItem('cartInfo')
+  // 取出本地购物车中的商品并查重
+  let cartInfo = localStorage.cartInfo ? JSON.parse(localStorage.cartInfo) :[]
+  let isHaveGoods = cartInfo.find(cart => cart.goodsId == this.goodsId)
+  console.log('isHaveGoods',isHaveGoods)
+  if(!isHaveGoods) {
+    // 购物车中所属的商品信息
+    let newGoods = {
+      goodsId: this.goodsInfo.ID,
+      name: this.goodsInfo.NAME,
+      price:this.goodsInfo.PRESENT_PRICE,
+      image:this.goodsInfo.IMAGE1,
+      count:1
+    }
+    cartInfo.push(newGoods)
+    localStorage.cartInfo = JSON.stringify(cartInfo)  // localStorage本为字符串，要对数据进行处理
+    Toast.success('添加成功')
+  } else {
+    Toast.success('已有此商品')
+  }
+
+  this.$router.push({name:'Cart'})  //进行跳转
+}
+```
+
+##### 清空购物车
+
+```python
+//清空购物车的商品
+clearCart(){
+    localStorage.removeItem('cartInfo')
+    this.cartInfo=[]
+}
+```
+##### 商品单价与总价的计算
+
+商品单价，直接就是数量*单价
+
+```python
+<div class="allPrice">
+	 ${{ item.price * item.count | moneyFilter }}
+</div>
+```
+而总价，需要用到**`计算属性computed`**
+
+```python
+<!-- 计算总价 -->
+<div class="totalMoney">商品总价: ${{ totalMoney | moneyFilter}}</div>
+
+// 计算属性 计算总价
+computed: {
+  totalMoney() {
+    let allMoney = 0;
+    this.cartInfo.forEach((item, index) => {
+      allMoney += item.price * item.count;
+    });
+    // 当页面刷新时原有的数据会消失，保存之
+    localStorage.cartInfo = JSON.stringify(this.cartInfo);
+    return allMoney;
+  }
+} 
+```
+
