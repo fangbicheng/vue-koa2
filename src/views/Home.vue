@@ -6,7 +6,7 @@
 
 <script>
 // @ is an alias to /src
-import ShoppingMail from '@/components/ShoppingMail.vue'
+import ShoppingMail from '@/components/pages/ShoppingMail.vue'
 
 export default {
   name: 'home',
