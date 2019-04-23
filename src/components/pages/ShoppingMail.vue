@@ -109,6 +109,7 @@
               :key="index"
             >
               <goods-info
+                :goodsId="item.goodsId"
                 :goodsImage="item.image"
                 :goodsName="item.name"
                 :goodsPrice="item.price"
@@ -251,5 +252,10 @@ export default {
   font-size: 14px;
   height: 1.8rem;
   line-height: 1.8rem;
+}
+.hot-goods {
+  height: 130rem;
+  overflow: hidden;
+  background-color: #fff;
 }
 </style>

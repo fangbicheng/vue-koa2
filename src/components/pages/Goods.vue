@@ -79,6 +79,7 @@ export default {
     },
     // 添加商品到购物车
     addGoodsToCart() {
+      // localStorage.removeItem('cartInfo')
       // 取出本地购物车中的商品并查重
       let cartInfo = localStorage.cartInfo ? JSON.parse(localStorage.cartInfo) : []
       let isHaveGoods = cartInfo.find(cart => cart.goodsId == this.goodsId)
@@ -87,7 +88,7 @@ export default {
         // 购物车中所属的商品信息
         let newGoods = {
           goodsId: this.goodsInfo.ID,
-          Name: this.goodsInfo.Name,
+          name: this.goodsInfo.NAME,
           price:this.goodsInfo.PRESENT_PRICE,
           image:this.goodsInfo.IMAGE1,
           count:1
